@@ -7,6 +7,8 @@
     <link rel="icon" type="image/x-icon" href="../static/image/image.png">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/qrbank.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.7.107/build/pdf.min.js"></script>
 </head>
 <body>
@@ -19,15 +21,11 @@
                 </div>
                 <div class="nav-links">
                     <a href="/upload" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Upload</a>
+                        <i class="fas fa-arrow-left"></i> Upload</a>
                     <div class="user-info">
                         <div class="user-profile">
                             <i class="fas fa-user-circle"></i>
                             <span>{{ session.username }}</span>
-                        </div>
-                        <div class="user-points">
-                            <i class="fas fa-wallet"></i>
-                            <span>{{ user_points }}$</span>
                         </div>
                     </div>
                     <a href="/logout" class="logout-btn">
@@ -38,19 +36,39 @@
     </header>
 
     <main>
-        <div class="container">
+        <div class="container qrbank-container">
             <div class="welcome-section">
-                <h2>OCRmyPDF</h2>
+                <h2 class="qrbank-title">OCRmyPDF</h2>
                 <p>Converting PDF into searchable text tool</p>
             </div>
 
-            <div class="upload-layout">
-                <img src="../static/image/MAQR.jpg" alt="QR Banking" style="width: 484px; height: auto;">
+            <!-- Thêm phần hiển thị số dư ví -->
+            <div class="wallet-balance" style="width: 100%;">
+                <h3>Your Wallet Balance</h3>
+                <div class="balance-amount">{{ user_points|default(0) }} $</div>
+            </div>
+
+            <div class="qrbank-layout">
+                <img src="../static/image/MAQR.jpg" alt="QR Banking" class="qr-image">
                 
-                <div style="width: 484px; height: auto; background-color: #f0f0f0; padding: 20px; border-radius: 10px;">
+                <div class="contact-box">
                     <h3>Contact us</h3>
-                    <div>
-                        <p style="color: #000">ZALO: 0837887228</p>
+                    <div class="contact-info">
+                        <p style="font-size: 20px;"><strong>ZALO: 0837887228</strong></p>
+                    </div>
+                    
+                    <!-- Payment instruction syntax -->
+                    <div class="payment-instruction">
+                        <h4>Payment Instructions</h4>
+                        <p>Please transfer money with a note using the following syntax:</p>
+                        <div class="payment-syntax">
+                            <code>username - OCRmyPDF - [amount]$</code>
+                        </div>
+                        <p class="example">Example: <code>{{ session.username }} - OCRmyPDF - 20$</code></p>
+                    </div>
+                    
+                    <div class="contact-note">
+                        <p>Please scan the QR code or contact us via Zalo for support.</p>
                     </div>
                 </div>
             </div>
