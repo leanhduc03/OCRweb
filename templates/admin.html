@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  </head>
+  <body>
+    <!-- Header Navigation -->
+    <div class="header-content">
+      <div class="logo">
+        <img src="{{ url_for('static', filename='image/image.png') }}" alt="Logo">
+        <h1>OCRmyDPF</h1>
+      </div>
+      
+      <div class="user-info">
+        <div class="user-profile">
+          <i class="fas fa-user-shield"></i>
+          <span>{{ username }}</span>
+        </div>
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Log out
+        </a>
+      </div>
+    </div>
+
+    <div class="admin-container">
+      <h1>User Management</h1>
+      
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-message {% if messages[0][0] == 'success' %}success-message{% endif %}">
+          {% for category, message in messages %}
+            {{ message }}
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="table-container" style="max-height: 550px; overflow-y: auto;">
+        <table>
+          <tr>
+        <th>Username</th>
+        <th>Balance</th>
+        <th>Add Balance</th>
+          </tr>
+          {% for user in users %}
+          <tr>
+          <td>
+            {{ user[0] }}
+            <a href="{{ url_for('view_user_history', username=user[0]) }}" class="history-icon" title="User's history">
+              <i class="fas fa-history"></i>
+            </a>
+          </td>
+        <td>{{ user[1] }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('add_points') }}">
+            <input type="hidden" name="username" value="{{ user[0] }}" />
+            <input type="number" name="points" min="1" required />
+            <button type="submit">Add</button>
+          </form>
+        </td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </body>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 OCRmyPDF. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</html>

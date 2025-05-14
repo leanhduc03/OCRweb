@@ -1,0 +1,164 @@
+# SPDX-FileCopyrightText: 2022 James R. Barlow
+# SPDX-License-Identifier: MPL-2.0
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ocrmypdf"
+dynamic = ["version"]
+description = "OCRmyPDF adds an OCR text layer to scanned PDF files, allowing them to be searched"
+readme = "README.md"
+license = { text = "MPL-2.0" }
+requires-python = ">=3.10"
+dependencies = [
+  "deprecation>=2.1.0",
+  "img2pdf>=0.5",
+  "packaging>=20",
+  "pdfminer.six>=20220319",
+  "pi-heif",                # Heif image format - maintainers: if this is removed, it will NOT break
+  "pikepdf>=8.10.1",
+  "Pillow>=10.0.1",
+  "pluggy>=1",
+  "rich>=13",
+]
+authors = [{ name = "James R. Barlow", email = "james@purplerock.ca" }]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX",
+  "Operating System :: POSIX :: BSD",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Image Recognition",
+  "Topic :: Text Processing :: Indexing",
+  "Topic :: Text Processing :: Linguistic",
+]
+keywords = ["PDF", "OCR", "optical character recognition", "PDF/A", "scanning"]
+
+[project.urls]
+Documentation = "https://ocrmypdf.readthedocs.io/"
+Source = "https://github.com/ocrmypdf/OCRmyPDF"
+Tracker = "https://github.com/ocrmypdf/OCRmyPDF/issues"
+Changelog = "https://github.com/ocrmypdf/OCRmyPDF/docs/release_notes.rst"
+
+[project.optional-dependencies]
+docs = ["sphinx", "sphinx-issues", "sphinx-rtd-theme"]
+extended_test = ["PyMuPDF>=1.19.1"]
+test = [
+  "coverage[toml]>=6.2",
+  "hypothesis>=6.36.0",
+  "pytest>=6.2.5",
+  "pytest-cov>=3.0.0",
+  "pytest-xdist>=2.5.0",
+  "python-xmp-toolkit==2.0.1", # also requires apt-get install libexempi3
+  "reportlab>=3.6.8",
+  "types-Pillow",
+  "types-humanfriendly",
+]
+watcher = ["watchdog>=1.0.2", "typer-slim[standard]", "python-dotenv"]
+webservice = ["streamlit>=1.41.0"]
+
+[project.scripts]
+ocrmypdf = "ocrmypdf.__main__:run"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/ocrmypdf/_version.py"
+
+[tool.distutils.bdist_wheel]
+python-tag = "py310"
+
+[tool.coverage.run]
+branch = true
+parallel = true
+concurrency = ["multiprocessing", "thread"]
+sigterm = true
+
+[tool.coverage.paths]
+source = ["src/ocrmypdf"]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+  # Have to re-enable the standard pragma
+  "pragma: no cover",
+  # Don't complain if tests don't hit defensive assertion code:
+  "raise AssertionError",
+  "raise NotImplementedError",
+  # Don't complain if non-runnable code isn't run:
+  "if 0:",
+  "if False:",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+norecursedirs = ["lib", ".pc", ".git", "venv", "output", "cache", "resources"]
+testpaths = ["tests"]
+addopts = "-n auto"
+markers = ["slow"]
+filterwarnings = [
+  "ignore:.*XMLParser.*:DeprecationWarning",
+  "ignore:.*ast.NameConstant.*:DeprecationWarning:reportlab",
+  "ignore:.*distutils.*:DeprecationWarning:libxmp",
+]
+
+[tool.mypy]
+
+[[tool.mypy.overrides]]
+module = [
+  'pluggy',
+  'img2pdf',
+  'pdfminer.*',
+  'reportlab.*',
+  'fitz',
+  'libxmp.utils',
+]
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+"select" = [
+  "D",    # pydocstyle
+  "E",    # pycodestyle
+  "W",    # pycodestyle
+  "F",    # pyflakes
+  "I001", # isort
+  "UP",   # pyupgrade
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ocrmypdf"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"docs/conf.py" = ["D100", "D101", "D105"]
+"tests/*.py" = ["D100", "D101", "D102", "D103", "D105"]
+"misc/*.py" = ["D103", "D101", "D102"]
+"src/ocrmypdf/builtin_plugins/*.py" = ["D103", "D102", "D105"]
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[dependency-groups]
+dev = [
+  "mypy>=1.13.0",
+  "pymupdf>=1.24.14",
+  "streamlit-pdf-viewer>=0.0.19",
+  "streamlit>=1.40.2",
+  "ipykernel>=6.29.5",
+]

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCRmyPDF</title>
+    <link rel="icon" type="image/x-icon" href="../static/image/image.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="../static/image/image.png" alt="OCRmyPDF Logo">
+                    <h1>OCRmyPDF</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="welcome-section">
+                <h2>Welcome to OCRmyPDF</h2>
+                <p>Converting PDF into searchable text tool</p>
+            </div>
+
+            <div class="register-layout">
+                <div class="form-container">
+                    <h3>Register</h3>
+                    <form method="POST" id="registerForm">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input id="username" name="username" placeholder="Enter username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" placeholder="Enter password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm Password</label>
+                            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+                            <span id="password_error" class="error-message"></span>
+                        </div>
+                        <button type="submit" class="btn">Register</button>
+                    </form>
+                    
+                    <div class="login-link">
+                        <p>Already have an account? <a href="/login">Login now</a></p>
+                    </div>
+                    
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                        <div class="flash-message {% if category == 'success' %}success-message{% endif %}">
+                            <p>{{ messages[0] }}</p>
+                        </div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 OCRmyPDF. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const errorElement = document.getElementById('password_error');
+            
+            if (password !== confirmPassword) {
+                e.preventDefault(); // Ngăn form submit
+                errorElement.textContent = 'Passwords do not match!';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Kiểm tra real-time khi người dùng nhập
+        document.getElementById('confirm_password').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const errorElement = document.getElementById('password_error');
+            
+            if (password !== confirmPassword) {
+                errorElement.textContent = 'Passwords do not match!';
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

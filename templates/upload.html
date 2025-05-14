@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCRmyPDF</title>
+    <link rel="icon" type="image/x-icon" href="../static/image/image.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.7.107/build/pdf.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="../static/image/image.png" alt="OCRmyPDF Logo">
+                    <h1>OCRmyPDF</h1>
+                </div>
+                <div class="nav-links">
+                    <div class="user-info">
+                        <div class="user-profile">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ session.username }}</span>
+                        </div>
+                        <div class="user-points">
+                            <i class="fas fa-wallet"></i>
+                            <span>{{ user_points }}$</span>
+                        </div>
+                    </div>
+                    <a href="/logout" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Log out</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="welcome-section">
+                <h2>OCRmyPDF</h2>
+                <p>Converting PDF into searchable text tool</p>
+            </div>
+
+            <div class="upload-layout">
+                <div class="form-container">
+                    <h3>Upload your PDF</h3>
+                    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                        <div class="form-group">
+                            <div class="file-input-container">
+                                <label for="file" class="file-input-label">Select file</label>
+                                <input type="file" name="file" id="file" class="file-input" accept=".pdf" required> 
+                            </div>
+                            <div class="file-name" id="fileName">No file selected</div>
+                        </div>
+                        <button type="submit" class="btn">Convert</button>
+                    </form>
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="flash-message {% if category == 'success' %}success-message{% endif %}">
+                                    <p>{{ message }}</p>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                
+                <!-- Thêm container xem trước PDF -->
+                <div class="preview-container" id="preview-container">
+                    <h3>PDF Preview</h3>
+                    <div id="pdf-preview">
+                        <p class="preview-placeholder">PDF preview will appear here after OCR processing</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 OCRmyPDF. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('file').addEventListener('change', function() {
+            const fileName = this.files[0] ? this.files[0].name : 'No file selected';
+            document.getElementById('fileName').textContent = fileName;
+        });
+
+        // Xử lý form upload bằng Ajax
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Hiển thị thông báo đang xử lý
+            const flashContainer = document.createElement('div');
+            flashContainer.className = 'flash-message';
+            flashContainer.innerHTML = '<p>Đang xử lý, vui lòng đợi...</p>';
+            
+            // Tìm container để hiển thị flash message
+            const formContainer = document.querySelector('.form-container');
+            
+            // Xóa flash cũ nếu có
+            const oldFlash = document.querySelector('.flash-message');
+            if (oldFlash) {
+                oldFlash.remove();
+            }
+            
+            // Thêm flash mới
+            formContainer.appendChild(flashContainer);
+            
+            // Tạo FormData để gửi file
+            const formData = new FormData(this);
+            
+            // Gửi request
+            fetch('/upload', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Cập nhật flash message
+                if (data.status === 'success') {
+                    flashContainer.className = 'flash-message success-message';
+                    flashContainer.innerHTML = `
+                        <p>${data.message}</p>
+                        <p><a href="${data.download_url}" class="download-link">Tải xuống file đã xử lý</a></p>
+                    `;
+                    
+                    // Cập nhật số điểm người dùng nếu server trả về
+                    if (data.updated_points !== undefined) {
+                        const pointsElement = document.querySelector('.user-points span');
+                        if (pointsElement) {
+                            pointsElement.textContent = `${data.updated_points} $`;
+                        }
+                    }
+                    
+                    // Hiển thị PDF trong khu vực xem trước
+                    const previewElement = document.getElementById('pdf-preview');
+                    previewElement.innerHTML = ''; // Xóa placeholder
+                    
+                    // Tạo iframe để hiển thị PDF trực tiếp
+                    const iframe = document.createElement('iframe');
+                    iframe.src = data.preview_url; // Sử dụng URL xem trước
+                    iframe.width = '100%';
+                    iframe.height = '450px';
+                    iframe.style.border = 'none';
+                    previewElement.appendChild(iframe);
+                    
+                    // Hiển thị container xem trước nếu đang ẩn
+                    document.getElementById('preview-container').style.display = 'flex';
+                } else {
+                    flashContainer.className = 'flash-message';
+                    flashContainer.innerHTML = `<p>${data.message}</p>`;
+                }
+            })
+            .catch(error => {
+                flashContainer.className = 'flash-message';
+                flashContainer.innerHTML = '<p>Đã xảy ra lỗi khi xử lý file.</p>';
+                console.error(error);
+            });
+        });
+    </script>
+</body>
+</html>

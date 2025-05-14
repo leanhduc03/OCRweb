@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Lịch sử người dùng</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user_history.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  </head>
+  <body>
+    <!-- Header Navigation -->
+    <div class="header-content">
+      <div class="logo">
+        <img src="{{ url_for('static', filename='image/image.png') }}" alt="Logo">
+        <h1>OCRmyDPF</h1>
+      </div>
+      
+      <div class="user-info">
+        <!-- <div class="user-profile">
+          <i class="fas fa-user-shield"></i>
+          <span>{{ username }}</span>
+        </div> -->
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Log out
+        </a>
+      </div>
+    </div>
+
+    <div class="history-container">
+        <h1> {{ username }}'s wallet history</h1>
+        
+        <div class="table-container" style="max-height: 550px; overflow-y: auto;">
+            <table>
+                <tr>
+                    <th>Action</th>
+                    <th>Wallet Balance</th>
+                    <th>Timestamp</th>
+                </tr>
+                {% if history_records %}
+                    {% for record in history_records %}
+                        <tr>
+                            <td>{{ record[2] }}</td>
+                            <td>{{ record[3] }}</td>
+                            <td>{{ record[4] }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="3">Không có lịch sử nào.</td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+        
+        <div style="margin-top: 20px;"></div>
+            <a href="{{ url_for('admin_dashboard') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+  </body>
+        <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 OCRmyPDF. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</html>
