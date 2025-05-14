@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCRmyPDF</title>
+    <link rel="icon" type="image/x-icon" href="../static/image/image.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.7.107/build/pdf.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="../static/image/image.png" alt="OCRmyPDF Logo">
+                    <h1>OCRmyPDF</h1>
+                </div>
+                <div class="nav-links">
+                    <a href="/upload" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Upload</a>
+                    <div class="user-info">
+                        <div class="user-profile">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ session.username }}</span>
+                        </div>
+                        <div class="user-points">
+                            <i class="fas fa-wallet"></i>
+                            <span>{{ user_points }}$</span>
+                        </div>
+                    </div>
+                    <a href="/logout" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Log out</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="welcome-section">
+                <h2>OCRmyPDF</h2>
+                <p>Converting PDF into searchable text tool</p>
+            </div>
+
+            <div class="upload-layout">
+                <img src="../static/image/MAQR.jpg" alt="QR Banking" style="width: 484px; height: auto;">
+                
+                <div style="width: 484px; height: auto; background-color: #f0f0f0; padding: 20px; border-radius: 10px;">
+                    <h3>Contact us</h3>
+                    <div>
+                        <p style="color: #000">ZALO: 0837887228</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 OCRmyPDF. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

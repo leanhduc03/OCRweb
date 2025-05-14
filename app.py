@@ -272,6 +272,23 @@ def download_file(file_id):
         flash("File does not exist or has been deleted.")
         return redirect('/upload')
 
+@app.route('/qrbank')
+def qrbank():
+    if 'username' not in session:
+        return redirect('/login')
+    
+    # Cập nhật lại điểm người dùng
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT points FROM users WHERE username = %s", (session['username'],))
+    result = cursor.fetchone()
+    conn.close()
+
+    user_points = result[0] if result else 0
+    session['user_points'] = user_points
+
+    return render_template('qrbank.html', username=session['username'], user_points=user_points)
+
 @app.route('/preview/<file_id>')
 def preview_file(file_id):
     if 'username' not in session:
@@ -288,6 +305,7 @@ def preview_file(file_id):
 def logout():
     session.pop('username', None)
     session.pop('role', None)
+    session.pop('user_points', None)
     return redirect('/login')
 
 if __name__ == '__main__':
